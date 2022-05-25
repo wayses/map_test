@@ -12,19 +12,19 @@
   <link rel="stylesheet" href="css/fontawesome-all.min.css" />
   <link rel="stylesheet" href="css/leaflet-control-geocoder.Geocoder.css" />
   <link rel="stylesheet" href="css/leaflet-search.min.css" />
-  
+
   <link rel="stylesheet" href="js/leaflet.markercluster-1.4.1/MarkerCluster.css" />
   <link rel="stylesheet" href="js/leaflet.markercluster-1.4.1/MarkerCluster.Default.css" />
   <link rel="stylesheet" href="css/L.Control.Locate.min.css" />
   <link rel="stylesheet" href="css/leaflet.groupedlayercontrol.min.css" />
- 
+
   <link rel="stylesheet" href="css/leaflet.zoomhome.css" />
-  <link rel="stylesheet" href="css/font-awesome.min.css"/>
-  
+  <link rel="stylesheet" href="css/font-awesome.min.css" />
+
   <link rel="shortcut icon" href="#" />
   <link rel="icon" href="data:;base64,=">
-  
-  
+
+
 
 
   <style>
@@ -45,55 +45,56 @@
     }
 
     @media screen and (max-width: 600px) {
-        .search-tooltip {
-            overflow-x: auto;
-            width: auto;
-            max-width: 300px;
-          }
-          .search-tip {
-            overflow-x: auto;
-            width: auto;
-            height: auto;
-            hyphens: auto;
-            max-width: 400px;
-            overflow-wrap: anywhere;
-          }
-          .leaflet-popup-content-wrapper {
-            max-height: 500px;
-            max-width: 300px;
-          }
-          .leaflet-control-layers-expanded{
-            max-height: 500px;
-            max-width: 200px;
-          }
-        }
-      
+      .search-tooltip {
+        overflow-x: auto;
+        width: auto;
+        max-width: 300px;
+      }
+
+      .search-tip {
+        overflow-x: auto;
+        width: auto;
+        height: auto;
+        hyphens: auto;
+        max-width: 400px;
+        overflow-wrap: anywhere;
+      }
+
+      .leaflet-popup-content-wrapper {
+        max-height: 500px;
+        max-width: 300px;
+      }
+
+      .leaflet-control-layers-expanded {
+        max-height: 500px;
+        max-width: 200px;
+      }
+    }
+
     tr:nth-child(even) {
       background-color: #f2f2f2;
     }
 
-    
+
     table {
       border-collapse: collapse;
-      
+
     }
-   
+
     th {
-    width: 50%; 
+      width: 50%;
     }
- 
+
     .font-size1 {
       font-size: 10px;
     }
-   
-
   </style>
   <title>Карта доступних реабілітаційних послуг</title>
 </head>
 
 <body>
   <div id="map"></div>
-  
+
   <script src="js/leaflet.js"></script>
   <script src="js/leaflet.rotatedMarker.js"></script>
   <script src="js/leaflet.pattern.js"></script>
@@ -102,8 +103,8 @@
   <script src="js/rbush.min.js"></script>
   <script src="js/labelgun.min.js"></script>
   <script src="js/labels.js"></script>
-  <script src="js/leaflet-search.min.js"></script>
-  <script src="js/leaflet-search.src.js"></script>
+  <script src="js/leaflet-search.js"></script> --
+  <!--<script-- src="js/leaflet-search.src.js"></script-->
   <script src="js/leaflet-control-geocoder.Geocoder.js"></script>
   <script src="js/papaparse.min.js"></script>
   <script src="js/leaflet.markercluster-1.4.1/leaflet.markercluster.js"></script>
@@ -112,14 +113,14 @@
   <script src="js/leaflet.groupedlayercontrol.min.js"></script>
   <script src="js/leaflet.zoomhome.min.js"></script>
   <script src="js/leaflet-button-control.js"></script>
-  
+
   <script>
-   
- let pointsURL_rehab = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9GNbuCXUVZFqhRqkON9GuOt7YwsjaWRLdTj-c1-lzC_SQHTqUwVG-fFTXBfWMd8RznLUSbJZignxn/pub?gid=553413878&single=true&output=csv";
- let pointsURL_ATservis = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9GNbuCXUVZFqhRqkON9GuOt7YwsjaWRLdTj-c1-lzC_SQHTqUwVG-fFTXBfWMd8RznLUSbJZignxn/pub?gid=239284087&single=true&output=csv";
+
+    let pointsURL_rehab = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9GNbuCXUVZFqhRqkON9GuOt7YwsjaWRLdTj-c1-lzC_SQHTqUwVG-fFTXBfWMd8RznLUSbJZignxn/pub?gid=553413878&single=true&output=csv";
+    let pointsURL_ATservis = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9GNbuCXUVZFqhRqkON9GuOt7YwsjaWRLdTj-c1-lzC_SQHTqUwVG-fFTXBfWMd8RznLUSbJZignxn/pub?gid=239284087&single=true&output=csv";
 
 
-   
+
 
     const load = async (url) => {
       return new Promise((resolve, reject) => {
@@ -151,7 +152,10 @@
         features: [
           ...dataRehabs.map(property => ({
             type: "Feature",
-            properties: property,
+            properties: {
+              ...property,
+              uuid: `${property.name} ${property.city} (${property.id})`
+            },
             geometry: {
               type: "Point",
               coordinates: [property.lng, property.lat]
@@ -159,7 +163,6 @@
           }))
         ]
       }
-
 
       const dataServices = await load(pointsURL_ATservis);
       const json_ATservice = {
@@ -174,7 +177,10 @@
         features: [
           ...dataServices.map(property => ({
             type: "Feature",
-            properties: property,
+            properties: {
+              ...property,
+              uuid: `${property.name} ${property.city} (${property.id})`
+            },
             geometry: {
               type: "Point",
               coordinates: [property.lng, property.lat]
@@ -197,19 +203,19 @@
         minZoom: 6,
         center: [48.581, 32.344],
         zoom: 6,
-         }
+      }
 
       var map = L.map("map", mapOptions);
       var hash = new L.Hash(map);
 
-     var zoomHome = L.Control.zoomHome({
+      var zoomHome = L.Control.zoomHome({
         zoomHomeTitle: 'Повернутись у початкове положення',
         homeCoordinates: [48.581, 32.344],
         homeZoom: 6
-        });
-        zoomHome.addTo(map);
-      
-     map.attributionControl.setPrefix('<a>Керування картою можливе за допомогою клавіш +/-, ▲▼, ◀▶ | </a><a href="https://leafletjs.com" title="A JS library for interactive maps">    Leaflet</a>');
+      });
+      zoomHome.addTo(map);
+
+      map.attributionControl.setPrefix('<a>Керування картою можливе за допомогою клавіш +/-, ▲▼, ◀▶ | </a><a href="https://leafletjs.com" title="A JS library for interactive maps">    Leaflet</a>');
 
       var layer_OSMStandard = L.tileLayer(
         "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -225,7 +231,7 @@
       );
       map.addLayer(layer_OSMStandard);
 
-      // Add a layer "Реабілітаційні послуги при порушенні діяльності опорно-рухового апарату"
+      // Add the layer "Реабілітаційні послуги при порушенні діяльності опорно-рухового апарату"
       function pop_rehab1(feature, layer) {
         layer.on("click", function (e) {
           var popupContent =
@@ -253,7 +259,7 @@
                     </tr>\
                     <tr>\
                         <th>поштовий індекс</th>\
-                        <td>' + (feature.properties['post_index'] !== null ? Autolinker.link(feature.properties['post_index'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
+                        <td>' + (feature.properties['post_index'] !== null ? Autolinker.link(feature.properties['post_index'].toString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
                     </tr>\
                     <tr>\
                         <th>контактний номер телефону</th>\
@@ -281,20 +287,20 @@
                   <th colspan="2"; bgcolor="#f78118"; align="center";><font color="#fff">Перелік захворювань/ порушень, при яких установа надає реабілітаційні послуги</th>\
               </tr >\
               <tr>\
-              <td colspan="2;"align="center";>' + (feature.properties['description1'] !== null ? Autolinker.link(feature.properties['description1'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td colspan="2;"align="center";>' + (feature.properties['description1'] !== null ? Autolinker.link(feature.properties['description1'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
               <tr>\
                 <th colspan="2"; bgcolor="#f78118"; align="center";><font color="#fff">Примітки</th>\
               </tr>\
-              <td colspan="2">' + (feature.properties['notes'] !== null ? Autolinker.link(feature.properties['notes'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td colspan="2">' + (feature.properties['notes'] !== null ? Autolinker.link(feature.properties['notes'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
               <th colspan="2"; bgcolor="#f78118"; align="center";><font color="#fff">Інші напрямки реабілітаційних послуг</th>\
                       </tr >\
               <tr>\
               <th>при порушенні діяльності нервової системи</th>\
-              <td align="center";width=10%;>' + (feature.properties['rehab2'] !== null ? Autolinker.link(feature.properties['rehab2'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td align="center";width=10%;>' + (feature.properties['rehab2'] !== null ? Autolinker.link(feature.properties['rehab2'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
                 <th>при порушенні діяльності дихальної системи</th>\
@@ -314,7 +320,7 @@
               </tr>\
             </table > ';
 
-     layer.bindPopup(popupContent,{maxHeight: 400, maxWidth: 400}).openPopup();
+          layer.bindPopup(popupContent, { maxHeight: 400, maxWidth: 400 }).openPopup();
         });
       }
 
@@ -358,7 +364,7 @@
         },
       });
 
-      // Add a layer "Реабілітаційні послуги при порушенні діяльності нервової системи"
+      // Add the layer "Реабілітаційні послуги при порушенні діяльності нервової системи"
 
       function pop_rehab2(feature, layer) {
         layer.on("click", function (e) {
@@ -387,7 +393,7 @@
                     </tr>\
                     <tr>\
                         <th>поштовий індекс</th>\
-                        <td>' + (feature.properties['post_index'] !== null ? Autolinker.link(feature.properties['post_index'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
+                        <td>' + (feature.properties['post_index'] !== null ? Autolinker.link(feature.properties['post_index'].toString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
                     </tr>\
                     <tr>\
                         <th>контактний номер телефону</th>\
@@ -415,20 +421,20 @@
                   <th colspan="2"; bgcolor="#f78118"; align="center";><font color="#fff">Перелік захворювань/ порушень, при яких установа надає реабілітаційні послуги</th>\
               </tr >\
               <tr>\
-              <td colspan="2;"align="center";>' + (feature.properties['description2'] !== null ? Autolinker.link(feature.properties['description2'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td colspan="2;"align="center";>' + (feature.properties['description2'] !== null ? Autolinker.link(feature.properties['description2'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
               <tr>\
                 <th colspan="2"; bgcolor="#f78118"; align="center";><font color="#fff">Примітки</th>\
               </tr>\
-              <td colspan="2">' + (feature.properties['notes'] !== null ? Autolinker.link(feature.properties['notes'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td colspan="2">' + (feature.properties['notes'] !== null ? Autolinker.link(feature.properties['notes'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
               <th colspan="2"; bgcolor="#f78118"; align="center";><font color="#fff">Інші напрямки реабілітаційних послуг</th>\
                       </tr >\
               <tr>\
               <th>при порушенні діяльності опорно-рухового апарату</th>\
-              <td align="center";width=10%;>' + (feature.properties['rehab1'] !== null ? Autolinker.link(feature.properties['rehab1'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td align="center";width=10%;>' + (feature.properties['rehab1'] !== null ? Autolinker.link(feature.properties['rehab1'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
                 <th>при порушенні діяльності дихальної системи</th>\
@@ -448,7 +454,7 @@
               </tr>\
             </table > ';
 
-     layer.bindPopup(popupContent,{maxHeight: 400, maxWidth: 400}).openPopup();
+          layer.bindPopup(popupContent, { maxHeight: 400, maxWidth: 400 }).openPopup();
         });
       }
 
@@ -471,7 +477,7 @@
         },
       });
 
-      // Add a layer "Реаблітіаційні послуги при порушенні діяльності дихальної системи"
+      // Add the layer "Реаблітіаційні послуги при порушенні діяльності дихальної системи"
 
       function pop_rehab3(feature, layer) {
         layer.on("click", function (e) {
@@ -500,7 +506,7 @@
                     </tr>\
                     <tr>\
                         <th>поштовий індекс</th>\
-                        <td>' + (feature.properties['post_index'] !== null ? Autolinker.link(feature.properties['post_index'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
+                        <td>' + (feature.properties['post_index'] !== null ? Autolinker.link(feature.properties['post_index'].toString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
                     </tr>\
                     <tr>\
                         <th>контактний номер телефону</th>\
@@ -528,13 +534,13 @@
                   <th colspan="2"; bgcolor="#f78118"; align="center";><font color="#fff">Перелік захворювань/ порушень, при яких установа надає реабілітаційні послуги</th>\
               </tr >\
               <tr>\
-              <td colspan="2;"align="center";>' + (feature.properties['description3'] !== null ? Autolinker.link(feature.properties['description3'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td colspan="2;"align="center";>' + (feature.properties['description3'] !== null ? Autolinker.link(feature.properties['description3'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
               <tr>\
                 <th colspan="2"; bgcolor="#f78118"; align="center";><font color="#fff">Примітки</th>\
               </tr>\
-              <td colspan="2">' + (feature.properties['notes'] !== null ? Autolinker.link(feature.properties['notes'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td colspan="2">' + (feature.properties['notes'] !== null ? Autolinker.link(feature.properties['notes'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
               <th colspan="2"; bgcolor="#f78118"; align="center";><font color="#fff">Інші напрямки реабілітаційних послуг</th>\
@@ -544,7 +550,7 @@
               </tr>\
               <tr>\
               <th>при порушенні діяльності нервової системи</th>\
-              <td align="center";width=10%;>' + (feature.properties['rehab2'] !== null ? Autolinker.link(feature.properties['rehab2'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td align="center";width=10%;>' + (feature.properties['rehab2'] !== null ? Autolinker.link(feature.properties['rehab2'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
                <th>при порушенні діяльності серцево-судинної системи</th>\
@@ -560,7 +566,7 @@
               </tr>\
             </table > ';
 
-     layer.bindPopup(popupContent,{maxHeight: 400, maxWidth: 400}).openPopup();
+          layer.bindPopup(popupContent, { maxHeight: 400, maxWidth: 400 }).openPopup();
         });
       }
 
@@ -583,10 +589,10 @@
         },
       });
 
-      // Add a layer "Реабілітаційні послуги при порушенні діяльності серцево-судинної системи"
+      // Add the layer "Реабілітаційні послуги при порушенні діяльності серцево-судинної системи"
 
       function pop_rehab4(feature, layer) {
-        layer.on("click", function (e){
+        layer.on("click", function (e) {
           var popupContent =
             '<table>\
               <tr>\
@@ -612,7 +618,7 @@
                     </tr>\
                     <tr>\
                         <th>поштовий індекс</th>\
-                        <td>' + (feature.properties['post_index'] !== null ? Autolinker.link(feature.properties['post_index'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
+                        <td>' + (feature.properties['post_index'] !== null ? Autolinker.link(feature.properties['post_index'].toString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
                     </tr>\
                     <tr>\
                         <th>контактний номер телефону</th>\
@@ -640,13 +646,13 @@
                   <th colspan="2"; bgcolor="#f78118"; align="center";><font color="#fff">Перелік захворювань/ порушень, при яких установа надає реабілітаційні послуги</th>\
               </tr >\
               <tr>\
-              <td colspan="2;"align="center";>' + (feature.properties['description4'] !== null ? Autolinker.link(feature.properties['description4'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td colspan="2;"align="center";>' + (feature.properties['description4'] !== null ? Autolinker.link(feature.properties['description4'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
               <tr>\
                 <th colspan="2"; bgcolor="#f78118"; align="center";><font color="#fff">Примітки</th>\
               </tr>\
-              <td colspan="2">' + (feature.properties['notes'] !== null ? Autolinker.link(feature.properties['notes'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td colspan="2">' + (feature.properties['notes'] !== null ? Autolinker.link(feature.properties['notes'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
               <th colspan="2"; bgcolor="#f78118"; align="center";><font color="#fff">Інші напрямки реабілітаційних послуг</th>\
@@ -656,7 +662,7 @@
                 <td align="center";>' + (feature.properties['rehab1'] !== null ? Autolinker.link(feature.properties['rehab1'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <th>при порушенні діяльності нервової системи</th>\
-              <td align="center";width=10%;>' + (feature.properties['rehab2'] !== null ? Autolinker.link(feature.properties['rehab2'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td align="center";width=10%;>' + (feature.properties['rehab2'] !== null ? Autolinker.link(feature.properties['rehab2'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
                 <th>при порушенні діяльності дихальної системи</th>\
@@ -672,7 +678,7 @@
               </tr>\
             </table > ';
 
-     layer.bindPopup(popupContent,{maxHeight: 400, maxWidth: 400}).openPopup();
+          layer.bindPopup(popupContent, { maxHeight: 400, maxWidth: 400 }).openPopup();
         });
       }
 
@@ -695,7 +701,7 @@
         },
       });
 
-      // Add a layer "Реаблітіаційні послуги у геріатрії"
+      // Add the layer "Реаблітіаційні послуги у геріатрії"
 
       function pop_rehab5(feature, layer) {
         layer.on("click", function (e) {
@@ -724,7 +730,7 @@
                     </tr>\
                     <tr>\
                         <th>поштовий індекс</th>\
-                        <td>' + (feature.properties['post_index'] !== null ? Autolinker.link(feature.properties['post_index'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
+                        <td>' + (feature.properties['post_index'] !== null ? Autolinker.link(feature.properties['post_index'].toString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
                     </tr>\
                     <tr>\
                         <th>контактний номер телефону</th>\
@@ -752,13 +758,13 @@
                   <th colspan="2"; bgcolor="#f78118"; align="center";><font color="#fff">Перелік захворювань/ порушень, при яких установа надає реабілітаційні послуги</th>\
               </tr >\
               <tr>\
-              <td colspan="2;"align="center";>' + (feature.properties['description5'] !== null ? Autolinker.link(feature.properties['description5'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td colspan="2;"align="center";>' + (feature.properties['description5'] !== null ? Autolinker.link(feature.properties['description5'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
               <tr>\
                 <th colspan="2"; bgcolor="#f78118"; align="center";><font color="#fff">Примітки</th>\
               </tr>\
-              <td colspan="2">' + (feature.properties['notes'] !== null ? Autolinker.link(feature.properties['notes'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td colspan="2">' + (feature.properties['notes'] !== null ? Autolinker.link(feature.properties['notes'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
               <th colspan="2"; bgcolor="#f78118"; align="center";><font color="#fff">Інші напрямки реабілітаційних послуг</th>\
@@ -768,7 +774,7 @@
                 <td align="center";>' + (feature.properties['rehab1'] !== null ? Autolinker.link(feature.properties['rehab1'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <th>при порушенні діяльності нервової системи</th>\
-              <td align="center";width=10%;>' + (feature.properties['rehab2'] !== null ? Autolinker.link(feature.properties['rehab2'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td align="center";width=10%;>' + (feature.properties['rehab2'] !== null ? Autolinker.link(feature.properties['rehab2'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
                 <th>при порушенні діяльності дихальної системи</th>\
@@ -784,7 +790,7 @@
               </tr>\
             </table > ';
 
-     layer.bindPopup(popupContent,{maxHeight: 400, maxWidth: 400}).openPopup();
+          layer.bindPopup(popupContent, { maxHeight: 400, maxWidth: 400 }).openPopup();
         });
       }
 
@@ -807,7 +813,7 @@
         },
       });
 
-      // Add a layer "Реабілітаційні послуги у педіатрії"
+      // Add the layer "Реабілітаційні послуги у педіатрії"
 
       function pop_rehab6(feature, layer) {
         layer.on("click", function (e) {
@@ -836,7 +842,7 @@
                     </tr>\
                     <tr>\
                         <th>поштовий індекс</th>\
-                        <td>' + (feature.properties['post_index'] !== null ? Autolinker.link(feature.properties['post_index'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
+                        <td>' + (feature.properties['post_index'] !== null ? Autolinker.link(feature.properties['post_index'].toString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
                     </tr>\
                     <tr>\
                         <th>контактний номер телефону</th>\
@@ -864,13 +870,13 @@
                   <th colspan="2"; bgcolor="#f78118"; align="center";><font color="#fff">Перелік захворювань/ порушень, при яких установа надає реабілітаційні послуги</th>\
               </tr >\
               <tr>\
-              <td colspan="2;"align="center";>' + (feature.properties['description6'] !== null ? Autolinker.link(feature.properties['description6'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td colspan="2;"align="center";>' + (feature.properties['description6'] !== null ? Autolinker.link(feature.properties['description6'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
               <tr>\
                 <th colspan="2"; bgcolor="#f78118"; align="center";><font color="#fff">Примітки</th>\
               </tr>\
-              <td colspan="2">' + (feature.properties['notes'] !== null ? Autolinker.link(feature.properties['notes'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td colspan="2">' + (feature.properties['notes'] !== null ? Autolinker.link(feature.properties['notes'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
               <th colspan="2"; bgcolor="#f78118"; align="center";><font color="#fff">Інші напрямки реабілітаційних послуг</th>\
@@ -880,7 +886,7 @@
                 <td align="center";>' + (feature.properties['rehab1'] !== null ? Autolinker.link(feature.properties['rehab1'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <th>при порушенні діяльності нервової системи</th>\
-              <td align="center";width=10%;>' + (feature.properties['rehab2'] !== null ? Autolinker.link(feature.properties['rehab2'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td align="center";width=10%;>' + (feature.properties['rehab2'] !== null ? Autolinker.link(feature.properties['rehab2'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
                 <th>при порушенні діяльності дихальної системи</th>\
@@ -896,7 +902,7 @@
               </tr>\
             </table > ';
 
-     layer.bindPopup(popupContent,{maxHeight: 400, maxWidth: 400}).openPopup();
+          layer.bindPopup(popupContent, { maxHeight: 400, maxWidth: 400 }).openPopup();
         });
       }
 
@@ -921,7 +927,7 @@
 
 
 
-      // Add a layer "Магазини медичної техніки"
+      // Add the layer "Магазини медичної техніки"
 
       function pop_ATservice(feature, layer) {
         layer.on("click", function (e) {
@@ -950,7 +956,7 @@
                     </tr>\
                     <tr>\
                         <th>поштовий індекс</th>\
-                        <td>' + (feature.properties['post_index'] !== null ? Autolinker.link(feature.properties['post_index'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
+                        <td>' + (feature.properties['post_index'] !== null ? Autolinker.link(feature.properties['post_index'].toString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
                     </tr>\
                     <tr>\
                         <th>контактний номер телефону</th>\
@@ -978,18 +984,18 @@
                   <th colspan="2"; bgcolor="#467cb7"; align="center";><font color="#fff">Перелік асистивних засобів, якими забезпечує установа</th>\
               </tr >\
               <tr>\
-              <td colspan="2;"align="center";>' + (feature.properties['Types_asistive'] !== null ? Autolinker.link(feature.properties['Types_asistive'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td colspan="2;"align="center";>' + (feature.properties['Types_asistive'] !== null ? Autolinker.link(feature.properties['Types_asistive'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
               <tr>\
                 <th colspan="2"; bgcolor="#467cb7"; align="center";><font color="#fff">Примітки</th>\
               </tr>\
-              <td colspan="2">' + (feature.properties['notes'] !== null ? Autolinker.link(feature.properties['notes'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td colspan="2">' + (feature.properties['notes'] !== null ? Autolinker.link(feature.properties['notes'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               <tr>\
               </tr>\
             </table > ';
 
-     layer.bindPopup(popupContent,{maxHeight: 400, maxWidth: 400}).openPopup();
+          layer.bindPopup(popupContent, { maxHeight: 400, maxWidth: 400 }).openPopup();
         });
       }
 
@@ -1034,7 +1040,7 @@
       });
 
 
-      // Add a layer "Управління праці та соціального захисту населення"
+      // Add the layer "Управління праці та соціального захисту населення"
       function pop_ATservice2(feature, layer) {
         layer.on("click", function (e) {
           var popupContent =
@@ -1062,7 +1068,7 @@
                     </tr>\
                     <tr>\
                         <th>поштовий індекс</th>\
-                        <td>' + (feature.properties['post_index'] !== null ? Autolinker.link(feature.properties['post_index'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
+                        <td>' + (feature.properties['post_index'] !== null ? Autolinker.link(feature.properties['post_index'].toString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
                     </tr>\
                     <tr>\
                         <th>контактний номер телефону</th>\
@@ -1090,18 +1096,18 @@
                   <th colspan="2"; bgcolor="#467cb7"; align="center";><font color="#fff">Перелік асистивних засобів, якими забезпечує установа</th>\
               </tr >\
               <tr>\
-              <td colspan="2;"align="center";>' + (feature.properties['Types_asistive'] !== null ? Autolinker.link(feature.properties['Types_asistive'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td colspan="2;"align="center";>' + (feature.properties['Types_asistive'] !== null ? Autolinker.link(feature.properties['Types_asistive'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
               <tr>\
                 <th colspan="2"; bgcolor="#467cb7"; align="center";><font color="#fff">Примітки</th>\
               </tr>\
-              <td colspan="2">' + (feature.properties['notes'] !== null ? Autolinker.link(feature.properties['notes'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td colspan="2">' + (feature.properties['notes'] !== null ? Autolinker.link(feature.properties['notes'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               <tr>\
               </tr>\
             </table > ';
 
-     layer.bindPopup(popupContent,{maxHeight: 400, maxWidth: 400}).openPopup();
+          layer.bindPopup(popupContent, { maxHeight: 400, maxWidth: 400 }).openPopup();
         });
       }
 
@@ -1128,7 +1134,7 @@
       });
 
 
-      // Add a layer "Підприємства, які виробляють технічні та інші засоби реабілітації"
+      // Add the layer "Підприємства, які виробляють технічні та інші засоби реабілітації"
       function pop_ATservice3(feature, layer) {
         layer.on("click", function (e) {
           var popupContent =
@@ -1156,7 +1162,7 @@
                     </tr>\
                     <tr>\
                         <th>поштовий індекс</th>\
-                        <td>' + (feature.properties['post_index'] !== null ? Autolinker.link(feature.properties['post_index'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
+                        <td>' + (feature.properties['post_index'] !== null ? Autolinker.link(feature.properties['post_index'].toString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
                     </tr>\
                     <tr>\
                         <th>контактний номер телефону</th>\
@@ -1184,18 +1190,18 @@
                   <th colspan="2"; bgcolor="#467cb7"; align="center";><font color="#fff">Перелік асистивних засобів, якими забезпечує установа</th>\
               </tr >\
               <tr>\
-              <td colspan="2;"align="center";>' + (feature.properties['Types_asistive'] !== null ? Autolinker.link(feature.properties['Types_asistive'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td colspan="2;"align="center";>' + (feature.properties['Types_asistive'] !== null ? Autolinker.link(feature.properties['Types_asistive'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               </tr>\
               <tr>\
               <tr>\
                 <th colspan="2"; bgcolor="#467cb7"; align="center";><font color="#fff">Примітки</th>\
               </tr>\
-              <td colspan="2">' + (feature.properties['notes'] !== null ? Autolinker.link(feature.properties['notes'].toLocaleString(), {truncate: {length: 30, location: 'smart' } }) : '') + '</td>\
+              <td colspan="2">' + (feature.properties['notes'] !== null ? Autolinker.link(feature.properties['notes'].toLocaleString(), { truncate: { length: 30, location: 'smart' } }) : '') + '</td>\
               <tr>\
               </tr>\
             </table > ';
 
-     layer.bindPopup(popupContent,{maxHeight: 400, maxWidth: 400}).openPopup();
+          layer.bindPopup(popupContent, { maxHeight: 400, maxWidth: 400 }).openPopup();
         });
       }
       var layer_ATservice3 = new L.geoJson(json_ATservice, {
@@ -1221,7 +1227,7 @@
       });
 
 
-// create groups of layers
+      // create groups of layers
       const mcg = L.markerClusterGroup({
         spiderfyOnMaxZoom: true,
         showCoverageOnHover: false,
@@ -1234,7 +1240,7 @@
       const layer_rehab4Group = L.featureGroup.subGroup(mcg);
       const layer_rehab3Group = L.featureGroup.subGroup(mcg);
       const layer_rehab2Group = L.featureGroup.subGroup(mcg);
-      const layer_rehab1Group = L.featureGroup.subGroup(mcg);        
+      const layer_rehab1Group = L.featureGroup.subGroup(mcg);
 
 
       const layer_ATservice3Group = L.featureGroup.subGroup(mcg);
@@ -1249,84 +1255,83 @@
       layer_rehab2Group.addLayer(layer_rehab2);
       layer_rehab1Group.addLayer(layer_rehab1);
 
-      
+
       layer_ATservice3Group.addLayer(layer_ATservice3);
       layer_ATservice2Group.addLayer(layer_ATservice2);
       layer_ATservice1Group.addLayer(layer_ATservice1);
-      
+
       map.addLayer(layer_rehab6Group);
       map.addLayer(layer_rehab5Group);
       map.addLayer(layer_rehab4Group);
       map.addLayer(layer_rehab3Group);
       map.addLayer(layer_rehab2Group);
       map.addLayer(layer_rehab1Group);
-      
+
 
       map.addLayer(layer_ATservice3Group);
       map.addLayer(layer_ATservice2Group);
       map.addLayer(layer_ATservice1Group);
 
-// create 'Увімкнути / вимкнути усі шари'
-        
-    // Overlay layers are grouped
-    var groupedOverlays = {
+      // create 'Увімкнути / вимкнути усі шари'
+
+      // Overlay layers are grouped
+      var groupedOverlays = {
         'Увімкнути / вимкнути усі шари': {
-        '<img src="legend/rehab.png" /> Реабілітаційні послуги при порушенні діяльності опорно-рухового апарату': layer_rehab1Group,
-        '<img src="legend/rehab.png" /> Реабілітаційні послуги при порушенні діяльності нервової системи': layer_rehab2Group,
-        '<img src="legend/rehab.png" /> Реаблітіаційні послуги при порушенні діяльності дихальної системи': layer_rehab3Group,
-        '<img src="legend/rehab.png" /> Реабілітаційні послуги при порушенні діяльності серцево-судинної системи': layer_rehab4Group,
-        '<img src="legend/rehab.png" /> Реаблітіаційні послуги у геріатрії': layer_rehab5Group,
-        '<img src="legend/rehab.png" /> Реабілітаційні послуги у педіатрії': layer_rehab6Group,
-        '<img src="legend/at_servis.png" /> Магазини медичної техніки': layer_ATservice1Group,
-        '<img src="legend/at_servis.png" /> Управління праці та соціального захисту населення': layer_ATservice2Group,
-        '<img src="legend/at_servis.png" /> Підприємства, які виробляють технічні та інші засоби реабілітації': layer_ATservice3Group,
-      }
-    };
+          '<img src="legend/rehab.png" /> Реабілітаційні послуги при порушенні діяльності опорно-рухового апарату': layer_rehab1Group,
+          '<img src="legend/rehab.png" /> Реабілітаційні послуги при порушенні діяльності нервової системи': layer_rehab2Group,
+          '<img src="legend/rehab.png" /> Реаблітіаційні послуги при порушенні діяльності дихальної системи': layer_rehab3Group,
+          '<img src="legend/rehab.png" /> Реабілітаційні послуги при порушенні діяльності серцево-судинної системи': layer_rehab4Group,
+          '<img src="legend/rehab.png" /> Реаблітіаційні послуги у геріатрії': layer_rehab5Group,
+          '<img src="legend/rehab.png" /> Реабілітаційні послуги у педіатрії': layer_rehab6Group,
+          '<img src="legend/at_servis.png" /> Магазини медичної техніки': layer_ATservice1Group,
+          '<img src="legend/at_servis.png" /> Управління праці та соціального захисту населення': layer_ATservice2Group,
+          '<img src="legend/at_servis.png" /> Підприємства, які виробляють технічні та інші засоби реабілітації': layer_ATservice3Group,
+        }
+      };
 
-    var options = {
-     // Show a checkbox next to non-exclusive group labels for toggling all
-      groupCheckboxes: true,
-      checked:true,
-           
-    };
-    // Use the custom grouped layer control, not "L.control.layers"
-    var layerControl = L.control.groupedLayers(null, groupedOverlays, options);
-    map.addControl(layerControl);
-       
-        
+      var options = {
+        // Show a checkbox next to non-exclusive group labels for toggling all
+        groupCheckboxes: true,
+        checked: true,
 
-  // Button INFO
-     
-  L.Control.Button = L.Control.extend({
-    options: {
-        position: 'topleft'
-        
-    },
-    onAdd: function (map) {
-        var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-        var button = L.DomUtil.create('a', 'leaflet-control-button', container);
-        L.DomEvent.disableClickPropagation(button);
-        L.DomEvent.on(button, 'click', function(){ alert("Керування картою можливе за допомогою клавіш +/-, ▲▼, ◀▶")});
-      container.title = "Керування картою можливе за допомогою клавіш +/-, ▲▼, ◀▶";
-      button.innerHTML = '<img class="customClass" src=css/images/info.png>';
-        return container;
-    },
-    onRemove: function(map) {},
-    
-});
+      };
+      // Use the custom grouped layer control
+            var layerControl = L.control.groupedLayers(null, groupedOverlays, options);
+      map.addControl(layerControl);
 
-var ButtonHome = new L.Control.Button()
-    ButtonHome.addTo(map);
-    
+
+
+      // Button INFO
+
+      L.Control.Button = L.Control.extend({
+        options: {
+          position: 'topleft'
+
+        },
+        onAdd: function (map) {
+          var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+          var button = L.DomUtil.create('a', 'leaflet-control-button', container);
+          L.DomEvent.disableClickPropagation(button);
+          L.DomEvent.on(button, 'click', function () { alert("Керування картою можливе за допомогою клавіш +/-, ▲▼, ◀▶") });
+          container.title = "Керування картою можливе за допомогою клавіш +/-, ▲▼, ◀▶";
+          button.innerHTML = '<img class="customClass" src=css/images/info.png>';
+          return container;
+        },
+        onRemove: function (map) { },
+      });
+
+      var ButtonHome = new L.Control.Button()
+      ButtonHome.addTo(map);
+
 
 
       // create search for the user's location			
       L.control.locate({
         strings: { title: "Моє місцерозташування" },
         maxZoom: 12,
-      }).addTo(map); 
+      }).addTo(map);
 
-    // create search bar by words in the name of the object
+      // create search bar by words in the name of the object
 
       L.control.search({
         layer: mcg,
@@ -1336,15 +1341,40 @@ var ButtonHome = new L.Control.Button()
         textErr: "Об'єкт не знайдено",
         textPlaceholder: "Пошук по назві об'єкта",
         zoom: 16,
-        propertyName: 'name',
-        
+        propertyName: 'uuid',
+        sourceData: true,
+        filterData: (search, list) => {
+          const result = {};
+          const regSearch = new RegExp(search, 'i');
+
+          Object.keys(list)
+            .sort((a, b) => {
+              if (a > b) return 1;
+              if (a < b) return -1;
+              return 0;
+            })
+            .map((key) => {
+              if (regSearch.test(String(list[key].layer.feature.properties.name))) {
+                result[key] = list[key];
+                return;
+              }
+              if (regSearch.test(String(list[key].layer.feature.properties.id))) {
+                result[key] = list[key];
+                return;
+              }
+            });
+          return result;
+        },
         buildTip: function (text, val) {
-          var type = val.layer.feature.properties.city;
-          return '<a href="#" class="' + type + '">' + text + '<b>' + ' ' + type + '</b></a>';
+          const type = val.layer.feature.properties.city;
+          const title = val.layer.feature.properties.name;
+          const uuid = val.layer.feature.properties.uuid;
+          return '<a href="#" class="' + type + '">' + title + '<b>' + ' ' + type + '</b></a>';
         }
       }).addTo(map);
     }
-</script>
+  </script>
 
 </body>
+
 </html>
